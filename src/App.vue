@@ -29,7 +29,13 @@ onMounted(() => {
     <div v-if="effectsEnabled" class="vignette"></div>
     <div v-if="effectsEnabled" class="flicker"></div>
 
-    <div v-if="state.visualMode === 'static'" class="static-overlay"></div>
+    <div
+      v-if="
+        state.visualMode === 'static' || state.visualMode === 'static-reveal'
+      "
+      class="static-overlay"
+      :class="{ 'flicker-reveal': state.visualMode === 'static-reveal' }"
+    ></div>
 
     <main
       class="terminal-layout"
@@ -61,7 +67,9 @@ onMounted(() => {
         />
       </div>
       <div
-        v-else-if="state.visualMode === 'alien'"
+        v-else-if="
+          state.visualMode === 'alien' || state.visualMode === 'static-reveal'
+        "
         class="fullscreen-art alien"
       >
         <img :src="alienImage" alt="Alien" class="alien-image" />
@@ -117,20 +125,66 @@ onMounted(() => {
   left: 0;
   width: 100%;
   height: 100%;
-  background: repeating-radial-gradient(#000 0 0.0001%, #fff 0 0.0002%) 50% 0/2500px
+  background:
+    repeating-radial-gradient(#000 0 0.0001%, #fff 0 0.0002%) 50% 0/2500px
       2500px,
     repeating-conic-gradient(#000 0 0.0001%, #fff 0 0.0002%) 60% 60%/2500px
       2500px;
   background-blend-mode: difference;
   animation: b 0.2s infinite alternate;
   z-index: 100;
-  opacity: 0.8;
+  opacity: 1;
   pointer-events: none;
+}
+
+.static-overlay.flicker-reveal {
+  animation:
+    b 0.2s infinite alternate,
+    reveal-flicker 3s linear infinite;
+}
+
+@keyframes reveal-flicker {
+  0%,
+  10% {
+    opacity: 1;
+  }
+  12% {
+    opacity: 0.1;
+  }
+  14% {
+    opacity: 0.8;
+  }
+  16% {
+    opacity: 0.1;
+  }
+  18% {
+    opacity: 1;
+  }
+  30% {
+    opacity: 1;
+  }
+  32% {
+    opacity: 0.2;
+  }
+  34% {
+    opacity: 0.9;
+  }
+  36% {
+    opacity: 0.1;
+  }
+  38% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 @keyframes b {
   100% {
-    background-position: 50% 0, 60% 50%;
+    background-position:
+      50% 0,
+      60% 50%;
   }
 }
 
@@ -147,12 +201,19 @@ onMounted(() => {
 
 .fullscreen-art.alien {
   background: black;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 5;
 }
 
 .alien-image {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
   filter: grayscale(100%) contrast(1.2) brightness(0.8);
 }
 

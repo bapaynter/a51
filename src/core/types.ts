@@ -23,7 +23,13 @@ export interface GameState {
   inventory: string[]; // Collected items/knowledge
   username: string; // 'UNKNOWN' -> 'DIRECTOR'
   isStarted?: boolean;
-  visualMode?: "normal" | "red-alert" | "static" | "alien" | "victory";
+  visualMode?:
+    | "normal"
+    | "red-alert"
+    | "static"
+    | "alien"
+    | "victory"
+    | "static-reveal";
   visualContent?: string;
 }
 
@@ -41,7 +47,7 @@ export interface NetworkState {
 
 export type CommandHandler = (
   args: string[],
-  state: GameState,
+  state: GameState
 ) => CommandResult;
 
 export interface CommandResult {

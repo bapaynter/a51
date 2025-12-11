@@ -1,4 +1,5 @@
 import type { StageConfig, GameState } from "../../core/types";
+import { useAudio } from "../../composables/useAudio";
 
 const victoryText = `
 ACCESS GRANTED
@@ -26,32 +27,34 @@ export const endingStage: StageConfig = {
   description: "The end.",
   commands: {},
   onEnter: (state: GameState) => {
+    const { play } = useAudio();
     // 1. "CONTAINMENT BREACH DETECTED" in flashing red text.
     state.visualMode = "red-alert";
     state.visualContent = "CONTAINMENT BREACH DETECTED";
 
     // 2. Terminal fills with ASCII static (random characters flashing).
     setTimeout(() => {
+      play("static");
       state.visualMode = "static";
       state.visualContent = "";
-    }, 3000);
+    }, 1000);
 
-    // 3. Static clears to show ASCII art of a Grey alien face.
+    // 3. Static flickers to reveal the alien.
     setTimeout(() => {
-      state.visualMode = "alien";
+      state.visualMode = "static-reveal";
       state.visualContent = "";
-    }, 6000);
+    }, 1500);
 
     // 4. Terminal returns to static for 3 seconds.
     setTimeout(() => {
       state.visualMode = "static";
       state.visualContent = "";
-    }, 9000);
+    }, 3000);
 
     // 5. Static fades to reveal victory screen with apocalyptic message.
     setTimeout(() => {
       state.visualMode = "victory";
       state.visualContent = victoryText;
-    }, 12000);
+    }, 4500);
   },
 };
