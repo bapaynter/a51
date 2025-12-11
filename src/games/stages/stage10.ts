@@ -1,5 +1,4 @@
 import type { StageConfig, CommandResult, GameState } from "../../core/types";
-import { endingSequenceText } from "./ending";
 
 export const stage10: StageConfig = {
   id: 10,
@@ -38,15 +37,4 @@ export const stage10: StageConfig = {
       };
     },
   },
-};
-
-export const endingStage: StageConfig = {
-  id: 11,
-  name: "Ending",
-  description: "The end.",
-  terminalText: endingSequenceText,
-  onEnter: (_state: GameState) => {
-    // No inputs.
-  },
-  commands: {},
 };
