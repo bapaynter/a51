@@ -4,9 +4,9 @@ export const stage10: StageConfig = {
   id: 10,
   name: "The Final Decryption",
   description:
-    "The terminal displays a hex string: '43 4F 4E 46 49 52 4D 20 5B 73 74 61 67 65 34 5D 20 5B 73 74 61 67 65 37 5D 20 5B 73 74 61 67 65 31 5D 20 5B 73 74 61 67 65 38 5D' Convert these ASCII hex codes to text to get a command template with placeholders. Replace [stage4] with the stage 4 answer, [stage7] with the stage 7 answer, [stage1] with the stage 1 answer, and [stage8] with the stage 8 answer. Enter the completed command in uppercase.",
+    "The terminal displays a hex string: '43 4F 4E 46 49 52 4D 20 5B 50 52 4F 4A 45 43 54 5F 43 4F 44 45 4E 41 4D 45 5D 20 5B 41 43 43 45 53 53 5F 43 4F 44 45 5D 20 5B 53 49 47 4E 41 4C 5F 4F 52 49 47 49 4E 5D' Convert these ASCII hex codes to text to get a command template with placeholders.  Enter the completed command in uppercase.",
   terminalText:
-    "INCOMING TRANSMISSION...\n\n43 4F 4E 46 49 52 4D 20 5B 73 74 61 67 65 34 5D 20 5B 73 74 61 67 65 37 5D 20 5B 73 74 61 67 65 31 5D 20 5B 73 74 61 67 65 38 5D",
+    "INCOMING TRANSMISSION...\n\n43 4F 4E 46 49 52 4D 20 5B 50 52 4F 4A 45 43 54 5F 43 4F 44 45 4E 41 4D 45 5D 20 5B 41 43 43 45 53 53 5F 43 4F 44 45 5D 20 5B 53 49 47 4E 41 4C 5F 4F 52 49 47 49 4E 5D",
 
   onEnter: (state: GameState) => {
     state.unlockedCommands = ["help", "clear", "confirm"];
@@ -15,14 +15,12 @@ export const stage10: StageConfig = {
   commands: {
     confirm: (args: string[], _state: GameState): CommandResult => {
       const input = args.join(" ").toUpperCase();
-      // Expected: CONFIRM [stage4] [stage7] [stage1] [stage8]
-      // [stage4] = BLUEBOOK
-      // [stage7] = ZETA RETICULI
-      // [stage1] = 384
-      // [stage8] = 376
-      // Full command: CONFIRM BLUEBOOK ZETA RETICULI 384 376
-      // Since 'confirm' is the command, the args are the rest.
-      const expected = "BLUEBOOK ZETA RETICULI 384 376";
+      // Expected: CONFIRM [project_name] [access_code] [signal_origin]
+      // [project_name] = bluebook
+      // [access_code] = 384
+      // [signal_origin] = zeta reticuli
+      // Full command: CONFIRM BLUEBOOK 384 ZETA RETICULI
+      const expected = "BLUEBOOK 384 ZETA RETICULI";
 
       if (input === expected) {
         return {
