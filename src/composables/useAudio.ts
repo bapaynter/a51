@@ -1,14 +1,21 @@
 import { ref } from "vue";
+import keypressSound from "../assets/sounds/terminal-keypress.wav";
+import staticSound from "../assets/sounds/static-noise.wav";
+import humSound from "../assets/sounds/ambient-hum.wav";
+import successSound from "../assets/sounds/success-beep.wav";
+import errorSound from "../assets/sounds/error-buzz.wav";
+import alarmSound from "../assets/sounds/alarm-countdown.wav";
+import transmissionSound from "../assets/sounds/transmission.wav";
 
-// Map of sound names to filenames
+// Map of sound names to imported file URLs
 const SOUNDS = {
-  keypress: "terminal-keypress.wav",
-  static: "static-noise.wav",
-  hum: "ambient-hum.wav",
-  success: "success-beep.wav",
-  error: "error-buzz.wav",
-  alarm: "alarm-countdown.wav",
-  transmission: "transmission.wav",
+  keypress: keypressSound,
+  static: staticSound,
+  hum: humSound,
+  success: successSound,
+  error: errorSound,
+  alarm: alarmSound,
+  transmission: transmissionSound,
 } as const;
 
 type SoundName = keyof typeof SOUNDS;
@@ -22,8 +29,8 @@ export function useAudio() {
   const initAudio = () => {
     if (isInitialized) return;
 
-    Object.entries(SOUNDS).forEach(([key, filename]) => {
-      const audio = new Audio(`/src/assets/sounds/${filename}`);
+    Object.entries(SOUNDS).forEach(([key, src]) => {
+      const audio = new Audio(src);
       audioCache.set(key as SoundName, audio);
 
       // Configure specific sounds
