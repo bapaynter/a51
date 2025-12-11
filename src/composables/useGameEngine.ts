@@ -33,6 +33,7 @@ export function useGameEngine() {
     inventory: [],
     username: "UNKNOWN",
     isStarted: false,
+    visualMode: "normal",
   });
 
   const addLine = (content: string, type: TerminalLine["type"] = "output") => {

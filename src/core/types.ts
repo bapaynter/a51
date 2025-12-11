@@ -24,6 +24,7 @@ export interface GameState {
   username: string; // 'UNKNOWN' -> 'DIRECTOR'
   isStarted?: boolean;
   visualMode?: "normal" | "red-alert" | "static" | "alien" | "victory";
+  visualContent?: string;
 }
 
 export interface NetworkState {
