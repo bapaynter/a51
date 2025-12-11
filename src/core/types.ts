@@ -1,13 +1,13 @@
 export interface TerminalLine {
   id: number;
-  type: 'input' | 'output' | 'system' | 'error' | 'success' | 'info';
+  type: "input" | "output" | "system" | "error" | "success" | "info";
   content: string;
   typingEffect?: boolean;
 }
 
 export interface FileSystemNode {
   name: string;
-  type: 'file' | 'directory';
+  type: "file" | "directory";
   content?: string; // For files
   children?: FileSystemNode[]; // For directories
   encrypted?: boolean;
@@ -23,6 +23,7 @@ export interface GameState {
   inventory: string[]; // Collected items/knowledge
   username: string; // 'UNKNOWN' -> 'DIRECTOR'
   isStarted?: boolean;
+  visualMode?: "normal" | "red-alert" | "static" | "alien" | "victory";
 }
 
 export interface NetworkState {
@@ -32,18 +33,21 @@ export interface NetworkState {
       name: string;
       connected: boolean;
       unlocked: boolean;
-      type: 'server' | 'node';
-    }
+      type: "server" | "node";
+    };
   };
 }
 
-export type CommandHandler = (args: string[], state: GameState) => CommandResult;
+export type CommandHandler = (
+  args: string[],
+  state: GameState
+) => CommandResult;
 
 export interface CommandResult {
   output: string;
   success: boolean;
   newLines?: TerminalLine[]; // Advanced output (ASCII art)
-  action?: 'next_stage' | 'clear' | 'none';
+  action?: "next_stage" | "clear" | "none";
 }
 
 export interface StageConfig {
