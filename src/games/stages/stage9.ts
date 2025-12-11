@@ -1,8 +1,15 @@
 import type { StageConfig, CommandResult, GameState } from "../../core/types";
 import { useAudio } from "../../composables/useAudio";
 
-// let countdownId: number | null = null;
-// let remaining = 180; // 3 minutes
+let countdownId: number | null = null;
+let remaining = 180; // 3 minutes
+
+const stopTimer = () => {
+  if (countdownId) {
+    clearInterval(countdownId);
+    countdownId = null;
+  }
+};
 
 export const stage9: StageConfig = {
   id: 9,
@@ -16,6 +23,50 @@ export const stage9: StageConfig = {
     const { play, loop } = useAudio();
     play("alarm");
     loop("alarm", true); // Loop alarm
+
+    // Start Timer
+    stopTimer();
+    remaining = 180;
+
+    countdownId = window.setInterval(() => {
+      // Safety: Stop if stage changed (e.g. via global command)
+      if (state.currentStage !== 9) {
+        stopTimer();
+        return;
+      }
+
+      remaining--;
+
+      // Timeout Check
+      if (remaining <= 0) {
+        stopTimer();
+        if (state.addLine) {
+          state.addLine("!!! DEAUTHORIZED !!!", "error");
+          state.addLine("SYSTEM LOCKDOWN INITIATED...", "error");
+        }
+
+        // Transition back to start after a brief delay
+        setTimeout(() => {
+          // Only reset if we are still in stage 9 (user didn't solve it in the last second)
+          if (state.currentStage === 9 && state.changeStage) {
+            state.changeStage(1);
+          }
+        }, 2000);
+        return;
+      }
+
+      // Periodic Notifications (every 30s)
+      if (remaining % 30 === 0) {
+        const mins = Math.floor(remaining / 60)
+          .toString()
+          .padStart(2, "0");
+        const secs = (remaining % 60).toString().padStart(2, "0");
+        if (state.addLine) {
+          play("alarm");
+          state.addLine(`[!] TIME REMAINING: 00:${mins}:${secs}`, "info");
+        }
+      }
+    }, 1000);
   },
 
   commands: {
@@ -48,6 +99,7 @@ export const stage9: StageConfig = {
       if (code === expectedHex || code === prevHex) {
         const { loop } = useAudio();
         loop("alarm", false); // Stop alarm
+        stopTimer();
 
         return {
           success: true,

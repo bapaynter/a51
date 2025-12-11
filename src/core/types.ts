@@ -31,6 +31,9 @@ export interface GameState {
     | "victory"
     | "static-reveal";
   visualContent?: string;
+  // Runtime methods injected by engine
+  addLine?: (content: string, type?: TerminalLine["type"]) => void;
+  changeStage?: (stageId: number) => void;
 }
 
 export interface NetworkState {

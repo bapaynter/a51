@@ -70,6 +70,10 @@ export function useGameEngine() {
       transitionStage(11);
       return;
     }
+    if (command === "timethis") {
+      transitionStage(9);
+      return;
+    }
     if (command === "clear") {
       lines.value = [];
       return;
@@ -146,6 +150,10 @@ export function useGameEngine() {
       }
     }
   };
+
+  // Inject runtime methods for stages to use asynchronously
+  state.addLine = addLine;
+  state.changeStage = transitionStage;
 
   return {
     lines,
