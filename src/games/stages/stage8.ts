@@ -20,7 +20,7 @@ export const stage8: StageConfig = {
   commands: {
     monitor_temperatures: (
       _args: string[],
-      _state: GameState
+      _state: GameState,
     ): CommandResult => {
       return {
         success: true,

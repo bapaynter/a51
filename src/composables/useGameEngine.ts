@@ -79,7 +79,7 @@ export function useGameEngine() {
       const isMuted = useAudio().isMuted.value;
       addLine(
         isMuted ? "AUDIO OUTPUT DISABLED." : "AUDIO OUTPUT RESTORED.",
-        "info"
+        "info",
       );
       return;
     }
@@ -89,7 +89,7 @@ export function useGameEngine() {
         effectsEnabled.value
           ? "VISUAL EFFECTS ENABLED."
           : "VISUAL EFFECTS DISABLED.",
-        "info"
+        "info",
       );
       return;
     }
@@ -97,7 +97,7 @@ export function useGameEngine() {
       addLine(
         "Available commands: " +
           [...state.unlockedCommands, "mute", "effects"].join(", "),
-        "info"
+        "info",
       );
       return;
     }

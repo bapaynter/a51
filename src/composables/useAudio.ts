@@ -21,7 +21,7 @@ export function useAudio() {
   // Preload all sounds
   const initAudio = () => {
     if (isInitialized) return;
-    
+
     Object.entries(SOUNDS).forEach(([key, filename]) => {
       const audio = new Audio(`/src/assets/sounds/${filename}`);
       audioCache.set(key as SoundName, audio);
@@ -36,7 +36,7 @@ export function useAudio() {
         audio.volume = 0.2;
       }
     });
-    
+
     isInitialized = true;
   };
 
@@ -44,8 +44,8 @@ export function useAudio() {
     if (isMuted.value) return;
 
     if (!isInitialized) {
-        console.warn("Audio not initialized. Attempting lazy init.");
-        initAudio();
+      console.warn("Audio not initialized. Attempting lazy init.");
+      initAudio();
     }
 
     const audio = audioCache.get(name);

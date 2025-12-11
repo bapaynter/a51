@@ -41,7 +41,7 @@ export interface NetworkState {
 
 export type CommandHandler = (
   args: string[],
-  state: GameState
+  state: GameState,
 ) => CommandResult;
 
 export interface CommandResult {
