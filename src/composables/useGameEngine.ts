@@ -66,6 +66,10 @@ export function useGameEngine() {
     const args = parts.slice(1);
 
     // 1. Global Commands
+    if (command === "iamyourgod") {
+      transitionStage(10);
+      return;
+    }
     if (command === "clear") {
       lines.value = [];
       return;
