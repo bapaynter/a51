@@ -91,7 +91,8 @@ export function useGameEngine() {
     }
     if (command === "help") {
       addLine(
-        "Available commands: " + state.unlockedCommands.join(", "),
+        "Available commands: " +
+          [...state.unlockedCommands, "mute", "effects"].join(", "),
         "info"
       );
       return;
