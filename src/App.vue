@@ -4,7 +4,6 @@ import { useGameEngine } from "./composables/useGameEngine";
 import { useAudio } from "./composables/useAudio";
 import TerminalDisplay from "./components/TerminalDisplay.vue";
 import TerminalInput from "./components/TerminalInput.vue";
-import { startWitnessLogs } from "./games/stages/stage5";
 import alienImage from "./assets/images/aliens.jpg";
 
 const { lines, processCommand, effectsEnabled, state } = useGameEngine();
@@ -18,7 +17,6 @@ const handleGlobalClick = () => {
 };
 
 onMounted(() => {
-  // startWitnessLogs(); // Moved to stage 5 logic
   initAudio(); // Preload sounds
 });
 </script>
