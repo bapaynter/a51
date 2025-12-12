@@ -42,5 +42,15 @@ export const stage4: StageConfig = {
         action: "next_stage",
       };
     },
+    blue: (_args: string[], _state: GameState): CommandResult => {
+      if (_args[0] === "book") {
+        return {
+          success: true,
+          output:
+            "PROJECT BLUE BOOK ACCESS GRANTED\nLoading case files...\nCase #47 requires witness verification.\n> query_witness_database",
+          action: "next_stage",
+        };
+      }
+    },
   },
 };
