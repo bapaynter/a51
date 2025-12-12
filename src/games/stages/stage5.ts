@@ -27,7 +27,7 @@ export const startWitnessLogs = () => {
     const timestamp = (timePart || "").replace("Z", "");
     console.log(
       `%c${timestamp} ${noise}`,
-      "color: #555; font-family: monospace;",
+      "color: #555; font-family: monospace;"
     );
   }, 250) as unknown as number;
 
@@ -37,14 +37,14 @@ export const startWitnessLogs = () => {
     const timestamp = (timePart || "").replace("Z", "");
     console.log(
       `%c${timestamp} [SEC] WITNESS_ID: BENNEWITZ [CLASS_7_ONLY]`,
-      "color: #555; font-family: monospace;",
+      "color: #555; font-family: monospace;"
     );
 
     // Add immediate noise after to bury it if they aren't paying attention
     setTimeout(() => {
       console.log(
         `%c${timestamp} [SYS] FLUSHING BUFFERS...`,
-        "color: #555; font-family: monospace;",
+        "color: #555; font-family: monospace;"
       );
     }, 50);
   }, 5000) as unknown as number;
@@ -59,7 +59,11 @@ export const stage5: StageConfig = {
 
   onEnter: (state: GameState) => {
     state.unlockedCommands = ["help", "clear", "verify_witness", "check_logs"];
-    // Logs start globally in App.vue calling startWitnessLogs()
+    startWitnessLogs();
+  },
+
+  onResume: (_state: GameState) => {
+    startWitnessLogs();
   },
 
   commands: {

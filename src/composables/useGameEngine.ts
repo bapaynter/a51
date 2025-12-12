@@ -1,8 +1,10 @@
-import { ref, reactive } from "vue";
+import { ref, reactive, watch } from "vue";
 import type { GameState, TerminalLine, CommandResult } from "../core/types";
 import { getStage } from "../games/stages";
 import { initialFileSystem } from "../core/FileSystem";
 import { useAudio } from "./useAudio";
+
+const STORAGE_KEY = "a51_game_state";
 
 export function useGameEngine() {
   const { play } = useAudio();
@@ -24,9 +26,24 @@ export function useGameEngine() {
     },
   ]);
 
+  // Load state from localStorage
+  const loadState = (): Partial<GameState> | null => {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        return JSON.parse(stored);
+      }
+    } catch (e) {
+      console.error("Failed to load game state:", e);
+    }
+    return null;
+  };
+
+  const savedState = loadState();
+
   const state = reactive<GameState>({
     currentStage: 1,
-    files: initialFileSystem,
+    files: JSON.parse(JSON.stringify(initialFileSystem)),
     network: { connectedServer: null, nodes: {} },
     unlockedCommands: ["help", "clear", "mute", "effects"],
     history: [],
@@ -34,7 +51,36 @@ export function useGameEngine() {
     username: "UNKNOWN",
     isStarted: false,
     visualMode: "normal",
+    stageState: {},
+    ...savedState,
   });
+
+  // Save state whenever it changes
+  watch(
+    state,
+    (newState) => {
+      try {
+        // Create a clean object to save (excluding methods)
+        const stateToSave = {
+          currentStage: newState.currentStage,
+          files: newState.files,
+          network: newState.network,
+          unlockedCommands: newState.unlockedCommands,
+          history: newState.history,
+          inventory: newState.inventory,
+          username: newState.username,
+          isStarted: newState.isStarted,
+          visualMode: newState.visualMode,
+          visualContent: newState.visualContent,
+          stageState: newState.stageState,
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(stateToSave));
+      } catch (e) {
+        console.error("Failed to save game state:", e);
+      }
+    },
+    { deep: true }
+  );
 
   const addLine = (content: string, type: TerminalLine["type"] = "output") => {
     lines.value.push({
@@ -154,6 +200,30 @@ export function useGameEngine() {
   // Inject runtime methods for stages to use asynchronously
   state.addLine = addLine;
   state.changeStage = transitionStage;
+
+  // Resume game logic
+  if (savedState && state.isStarted) {
+    // Clear boot sequence if game is already started
+    lines.value = [
+      {
+        id: Date.now(),
+        type: "info",
+        content: "SYSTEM RESTORED. SESSION RESUMED.",
+      },
+    ];
+
+    // Re-initialize current stage if needed (e.g. restart timers)
+    const stage = getStage(state.currentStage);
+    if (stage) {
+      // Show stage context on resume
+      if (stage.terminalText) {
+        addLine(stage.terminalText, "info");
+      }
+      if (stage.onResume) {
+        stage.onResume(state);
+      }
+    }
+  }
 
   return {
     lines,

@@ -18,7 +18,7 @@ const handleGlobalClick = () => {
 };
 
 onMounted(() => {
-  startWitnessLogs();
+  // startWitnessLogs(); // Moved to stage 5 logic
   initAudio(); // Preload sounds
 });
 </script>

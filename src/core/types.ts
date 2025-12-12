@@ -31,6 +31,7 @@ export interface GameState {
     | "victory"
     | "static-reveal";
   visualContent?: string;
+  stageState?: Record<string, any>; // Generic storage for stage-specific data
   // Runtime methods injected by engine
   addLine?: (content: string, type?: TerminalLine["type"]) => void;
   changeStage?: (stageId: number) => void;
@@ -65,6 +66,7 @@ export interface StageConfig {
   name: string;
   description: string;
   onEnter?: (state: GameState) => void;
+  onResume?: (state: GameState) => void;
   commands: { [key: string]: CommandHandler };
   puzzleChk?: (state: GameState) => boolean; // Automatic check logic
   terminalText?: string;

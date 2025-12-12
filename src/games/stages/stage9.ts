@@ -11,6 +11,49 @@ const stopTimer = () => {
   }
 };
 
+const startCountdown = (state: GameState) => {
+  const { play } = useAudio();
+  countdownId = window.setInterval(() => {
+    // Safety: Stop if stage changed (e.g. via global command)
+    if (state.currentStage !== 9) {
+      stopTimer();
+      return;
+    }
+
+    remaining--;
+
+    // Timeout Check
+    if (remaining <= 0) {
+      stopTimer();
+      if (state.addLine) {
+        state.addLine("!!! DEAUTHORIZED !!!", "error");
+        state.addLine("SYSTEM LOCKDOWN INITIATED...", "error");
+      }
+
+      // Transition back to start after a brief delay
+      setTimeout(() => {
+        // Only reset if we are still in stage 9 (user didn't solve it in the last second)
+        if (state.currentStage === 9 && state.changeStage) {
+          state.changeStage(1);
+        }
+      }, 2000);
+      return;
+    }
+
+    // Periodic Notifications (every 30s)
+    if (remaining % 30 === 0) {
+      const mins = Math.floor(remaining / 60)
+        .toString()
+        .padStart(2, "0");
+      const secs = (remaining % 60).toString().padStart(2, "0");
+      if (state.addLine) {
+        play("alarm");
+        state.addLine(`[!] TIME REMAINING: 00:${mins}:${secs}`, "info");
+      }
+    }
+  }, 1000);
+};
+
 export const stage9: StageConfig = {
   id: 9,
   name: "Real-Time Clock",
@@ -27,46 +70,31 @@ export const stage9: StageConfig = {
     // Start Timer
     stopTimer();
     remaining = 180;
+    // Save start time to persist countdown
+    if (!state.stageState) state.stageState = {};
+    state.stageState.stage9_startTime = Date.now();
 
-    countdownId = window.setInterval(() => {
-      // Safety: Stop if stage changed (e.g. via global command)
-      if (state.currentStage !== 9) {
-        stopTimer();
-        return;
+    startCountdown(state);
+  },
+
+  onResume: (state: GameState) => {
+    // Resume timer if not already running
+    if (!countdownId) {
+      const { loop } = useAudio();
+      loop("alarm", true);
+
+      // Calculate remaining time based on saved start time
+      if (state.stageState && state.stageState.stage9_startTime) {
+        const elapsed = Math.floor(
+          (Date.now() - state.stageState.stage9_startTime) / 1000
+        );
+        remaining = Math.max(0, 180 - elapsed);
+      } else {
+        remaining = 180; // Fallback
       }
 
-      remaining--;
-
-      // Timeout Check
-      if (remaining <= 0) {
-        stopTimer();
-        if (state.addLine) {
-          state.addLine("!!! DEAUTHORIZED !!!", "error");
-          state.addLine("SYSTEM LOCKDOWN INITIATED...", "error");
-        }
-
-        // Transition back to start after a brief delay
-        setTimeout(() => {
-          // Only reset if we are still in stage 9 (user didn't solve it in the last second)
-          if (state.currentStage === 9 && state.changeStage) {
-            state.changeStage(1);
-          }
-        }, 2000);
-        return;
-      }
-
-      // Periodic Notifications (every 30s)
-      if (remaining % 30 === 0) {
-        const mins = Math.floor(remaining / 60)
-          .toString()
-          .padStart(2, "0");
-        const secs = (remaining % 60).toString().padStart(2, "0");
-        if (state.addLine) {
-          play("alarm");
-          state.addLine(`[!] TIME REMAINING: 00:${mins}:${secs}`, "info");
-        }
-      }
-    }, 1000);
+      startCountdown(state);
+    }
   },
 
   commands: {
