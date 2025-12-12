@@ -51,6 +51,10 @@ export const stage4: StageConfig = {
           action: "next_stage",
         };
       }
+      return {
+        success: false,
+        output: "Access denied. Project name incorrect.",
+      };
     },
   },
 };
