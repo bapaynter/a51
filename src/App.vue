@@ -11,6 +11,11 @@ const terminalInput = ref<InstanceType<typeof TerminalInput> | null>(null);
 const { initAudio, loop } = useAudio();
 
 const handleGlobalClick = () => {
+  // If the user is selecting text, don't steal focus
+  if (window.getSelection()?.toString().length) {
+    return;
+  }
+  
   terminalInput.value?.focusInput();
   initAudio(); // Ensure audio is ready on interaction
   loop("hum", true); // Start ambient hum
@@ -19,10 +24,30 @@ const handleGlobalClick = () => {
 onMounted(() => {
   initAudio(); // Preload sounds
 });
+const terminalDisplay = ref<InstanceType<typeof TerminalDisplay> | null>(null);
+
+const handleScroll = (direction: number) => {
+  terminalDisplay.value?.scrollPage(direction);
+};
+
+const handleGlobalWheel = (e: WheelEvent) => {
+  // If the target is already scrollable (like TerminalDisplay), let it handle it naturally
+  // unless we want to force custom scrolling everywhere. 
+  // However, TerminalDisplay has overflow-y: auto, so native scroll works there.
+  // We only want to intervene if the target is NOT the terminal display (or its children).
+  
+  const target = e.target as HTMLElement;
+  const terminalElement = terminalDisplay.value?.$el;
+  
+  // If the event didn't originate from within the terminal display
+  if (terminalElement && !terminalElement.contains(target)) {
+    terminalDisplay.value?.scrollByPixels(e.deltaY);
+  }
+};
 </script>
 
 <template>
-  <div class="crt-container" @click="handleGlobalClick">
+  <div class="crt-container" @click="handleGlobalClick" @wheel="handleGlobalWheel">
     <div v-if="effectsEnabled" class="scanlines"></div>
     <div v-if="effectsEnabled" class="vignette"></div>
     <div v-if="effectsEnabled" class="flicker"></div>
@@ -48,6 +73,7 @@ onMounted(() => {
         class="content"
       >
         <TerminalDisplay
+          ref="terminalDisplay"
           :lines="lines"
           :visual-mode="state.visualMode"
           :visual-content="state.visualContent"
@@ -62,6 +88,7 @@ onMounted(() => {
               .filter(Boolean)
           "
           @submit="processCommand"
+          @scroll="handleScroll"
         />
       </div>
       <div
@@ -114,7 +141,6 @@ onMounted(() => {
   flex-direction: column;
   flex: 1; /* Take remaining space */
   min-height: 0; /* Allow shrinking */
-  overflow: hidden; /* Prevent outer scroll */
 }
 
 .static-overlay {

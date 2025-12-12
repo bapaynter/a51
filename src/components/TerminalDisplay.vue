@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onUpdated, ref } from "vue";
+import { onUpdated, onBeforeUpdate, ref } from "vue";
 import type { PropType } from "vue";
 import type { TerminalLine } from "../core/types";
 
@@ -19,12 +19,35 @@ const props = defineProps({
 });
 
 const container = ref<HTMLElement | null>(null);
+const shouldAutoScroll = ref(true);
+
+onBeforeUpdate(() => {
+  if (container.value) {
+    const { scrollTop, scrollHeight, clientHeight } = container.value;
+    // Check if we are near the bottom (within 50px)
+    shouldAutoScroll.value = scrollHeight - (scrollTop + clientHeight) < 50;
+  }
+});
 
 onUpdated(() => {
-  if (container.value) {
+  if (container.value && shouldAutoScroll.value) {
     container.value.scrollTop = container.value.scrollHeight;
   }
 });
+
+const scrollPage = (direction: number) => {
+  if (!container.value) return;
+  const { clientHeight } = container.value;
+  // Scroll by 80% of page height
+  container.value.scrollBy({ top: direction * clientHeight * 0.8, behavior: 'smooth' });
+};
+
+const scrollByPixels = (pixels: number) => {
+  if (!container.value) return;
+  container.value.scrollTop += pixels;
+};
+
+defineExpose({ scrollPage, scrollByPixels });
 </script>
 
 <template>
@@ -38,11 +61,29 @@ onUpdated(() => {
 
 <style scoped>
 .terminal-display {
-  flex: 1;
+  flex: 1 1 0; /* Grow, shrink, basis 0 - robust flex sizing */
   min-height: 0; /* Crucial for scrolling inside flex */
-  overflow-y: hidden; /* Prevent manual scrolling back up */
+  overflow-y: auto; /* Allow scrolling */
   padding-bottom: 20px;
+  user-select: text; /* Allow text selection */
+  
+  /* Custom Scrollbar Styling for WebKit */
 }
+
+.terminal-display::-webkit-scrollbar {
+  width: 12px;
+}
+
+.terminal-display::-webkit-scrollbar-track {
+  background: #001100;
+}
+
+.terminal-display::-webkit-scrollbar-thumb {
+  background-color: #33ff00;
+  border: 3px solid #001100;
+  border-radius: 6px;
+}
+
 
 .line {
   margin-bottom: 4px;

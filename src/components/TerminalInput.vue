@@ -9,7 +9,7 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['submit']);
+const emit = defineEmits(['submit', 'scroll']);
 
 const input = ref('');
 const inputRef = ref<HTMLInputElement | null>(null);
@@ -48,6 +48,12 @@ const handleKey = (e: KeyboardEvent) => {
           }
        }
     }
+  } else if (e.key === 'PageUp') {
+    e.preventDefault();
+    emit('scroll', -1);
+  } else if (e.key === 'PageDown') {
+    e.preventDefault();
+    emit('scroll', 1);
   }
 };
 
